@@ -2,7 +2,8 @@
 
 # Download
 
-Download and extract the following files to the `data` directory/folder.
+Download and extract the following files to the `data` directory/folder. Note: you may need to make this folder yourself as GitHub won't let me keep an empty folder in the repo.
+Just keep it in the source directory (on the same level as `sample`)
 
 - [dlib facial landmark detector](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
   - `data/face_landmarks.dat`
