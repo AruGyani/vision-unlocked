@@ -2,11 +2,20 @@ import cv2
 import dlib
 import numpy as np
 
-up_threshold = 0
-down_threshold = 0.25
+up_threshold = 0.05
+down_threshold = 0.2
+
 # Initialize dlib's face detector and facial landmark predictor
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+
+def draw_eye(eye, frame):
+    for point in eye:
+        cv2.circle(frame, point, 2, (0, 255, 0), -1)
+
+    # Draw a circle at the approximate center of the eye (pupil location)
+    eye_center = np.mean(eye, axis=0).astype(int)
+    cv2.circle(frame, tuple(eye_center), 3, (0, 0, 255), -1)
 
 def get_eye_aspect_ratio(eye):
     A = np.linalg.norm(eye[1] - eye[5])
@@ -24,6 +33,9 @@ def analyze_gaze(image):
 
         left_eye = np.array([(landmarks.part(n).x, landmarks.part(n).y) for n in range(36, 42)])
         right_eye = np.array([(landmarks.part(n).x, landmarks.part(n).y) for n in range(42, 48)])
+
+        draw_eye(left_eye, image)
+        draw_eye(right_eye, image)
 
         left_EAR = get_eye_aspect_ratio(left_eye)
         right_EAR = get_eye_aspect_ratio(right_eye)
