@@ -5,20 +5,33 @@ def detect_pupil(eye_roi):
     # Convert to grayscale and apply Gaussian blur
     blurred = cv2.GaussianBlur(eye_roi, (7, 7), 0)
 
-    # Apply a binary threshold to get binary image
-    _, thresholded = cv2.threshold(blurred, 30, 255, cv2.THRESH_BINARY_INV)
+    # Apply adaptive thresholding
+    thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
 
     # Find contours
     contours, _ = cv2.findContours(thresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Find the largest contour which will be the pupil
-    contours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
-    if contours:
-        (x, y), radius = cv2.minEnclosingCircle(contours[0])
-        center = (int(x), int(y))
-        radius = int(radius)
-        return center, radius
+    # Filter contours based on area and circularity
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        perimeter = cv2.arcLength(contour, True)
+        if perimeter == 0:
+            continue
+        circularity = 4 * np.pi * (area / (perimeter * perimeter))
+        if area > 30 and circularity > 0.2:
+            (x, y), radius = cv2.minEnclosingCircle(contour)
+            return (int(x), int(y)), int(radius)
     return None, None
+
+def get_eyes(eyes, frame_shape):
+    if len(eyes) > 2:
+        eyes = sorted(eyes, key=lambda e: e[2] * e[3], reverse=True)  # Sort by size
+        for i in range(len(eyes)):
+            for j in range(i + 1, len(eyes)):
+                # Check if horizontally aligned and near the center of the frame
+                if abs(eyes[i][1] - eyes[j][1]) < 20 and abs((eyes[i][0] + eyes[j][0]) / 2 - frame_shape[1] / 2) < frame_shape[1] / 4:
+                    return [eyes[i], eyes[j]]
+    return eyes[:2]
 
 def draw_gaze_direction(frame, eye_position, pupil_center, eye_size):
     # Check if the pupil is in the upper or lower half of the eye
@@ -34,7 +47,7 @@ def draw_gaze_direction(frame, eye_position, pupil_center, eye_size):
     cv2.putText(frame, gaze_direction, (eye_position[0], eye_position[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
 # Initialize the camera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Load Haar cascade for eye detection
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
@@ -48,7 +61,8 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Detect eyes
-    eyes = eye_cascade.detectMultiScale(gray, 1.1, 4)
+    detected_eyes = eye_cascade.detectMultiScale(gray, 1.1, 4)
+    eyes = get_eyes(detected_eyes, frame.shape)
 
     for (ex, ey, ew, eh) in eyes:
         eye_roi = gray[ey:ey + eh, ex:ex + ew]
