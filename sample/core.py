@@ -6,12 +6,12 @@ import dlib
 import time
 import imutils
 
-# Initialize HOG-based face dtector and create facial landmark predictor
+# Initialize HOG-based face detector and create facial landmark predictor
 print("[STATUS] Loading face detector...")
 detector = dlib.get_frontal_face_detector()
 
 print('[STATUS] Starting camera...')
-vs = VideoStream(src=1).start()
+vs = VideoStream(src=0).start()
 
 prev = counter = total = 0
 
