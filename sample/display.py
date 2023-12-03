@@ -58,47 +58,47 @@ class Worker1(QThread):
 
   def run(self):
     self.ThreadActive = True
-    Capture = cv2.VideoCapture(0)
+    Capture = VideoStream(src=0).start()
+
     while self.ThreadActive:
-      ret, frame = Capture.read()
-      if ret:
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        rects = self.detector(gray, 0)
+      frame = Capture.read()
+      gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+      rects = self.detector(gray, 0)
 
-        for rect in rects:
-            (bX, bY, bW, bH) = to_bounding(rect)
-            cv2.rectangle(frame, (bX, bY), (bX + bW, bY + bH), (0, 255, 0), 1) # draw bounding box
+      for rect in rects:
+          (bX, bY, bW, bH) = to_bounding(rect)
+          cv2.rectangle(frame, (bX, bY), (bX + bW, bY + bH), (0, 255, 0), 1) # draw bounding box
 
-            self.counter, self.total, leftEye, rightEye = blink_detector(
-              img=gray, 
-              rect=rect,
-              counter=self.counter, 
-              total=self.total, 
-            )
-            detected_eyes = self.eye_cascade.detectMultiScale(gray, 1.1, 4)
-            eyes = get_eyes(detected_eyes, frame.shape)
+          self.counter, self.total, leftEye, rightEye = blink_detector(
+            img=gray, 
+            rect=rect,
+            counter=self.counter, 
+            total=self.total, 
+          )
+          detected_eyes = self.eye_cascade.detectMultiScale(gray, 1.1, 4)
+          eyes = get_eyes(detected_eyes, frame.shape)
 
-            for (ex, ey, ew, eh) in eyes:
-                eye_roi = gray[ey:ey + eh, ex:ex + ew]
-                pupil_center, pupil_radius = detect_pupil(eye_roi)
+          for (ex, ey, ew, eh) in eyes:
+              eye_roi = gray[ey:ey + eh, ex:ex + ew]
+              pupil_center, pupil_radius = detect_pupil(eye_roi)
 
-                if pupil_center and pupil_radius:
-                    cv2.circle(frame, (ex + pupil_center[0], ey + pupil_center[1]), pupil_radius, (255, 0, 0), 1)
-                    gaze_detector(frame, (ex, ey), pupil_center, (ew, eh))
+              if pupil_center and pupil_radius:
+                  cv2.circle(frame, (ex + pupil_center[0], ey + pupil_center[1]), pupil_radius, (255, 0, 0), 1)
+                  gaze_detector(frame, (ex, ey), pupil_center, (ew, eh))
 
-            for (x, y) in leftEye:
-              cv2.circle(frame, (x, y), 4, (0, 0, 255, -1))
+          for (x, y) in leftEye:
+            cv2.circle(frame, (x, y), 4, (0, 0, 255, -1))
 
-            for (x, y) in rightEye:
-              cv2.circle(frame, (x, y), 4, (0, 0, 255, -1))
+          for (x, y) in rightEye:
+            cv2.circle(frame, (x, y), 4, (0, 0, 255, -1))
 
-            cv2.putText(frame, "Blinks: {}".format(self.total), (20, 50),
-                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 0, 255), 4)
+          cv2.putText(frame, "Blinks: {}".format(self.total), (20, 50),
+                      cv2.FONT_HERSHEY_PLAIN, 4, (255, 0, 255), 4)
 
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        ConvertToQtFormat = QImage(image.data, image.shape[1], image.shape[0], QImage.Format_RGB888)
-        picture = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
-        self.ImageUpdate.emit(picture)
+      image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+      ConvertToQtFormat = QImage(image.data, image.shape[1], image.shape[0], QImage.Format_RGB888)
+      picture = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
+      self.ImageUpdate.emit(picture)
     Capture.release()
 
   def stop(self):
