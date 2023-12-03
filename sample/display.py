@@ -54,8 +54,7 @@ class MainWindow(QWidget):
     
     if current - self.timer >= 2:
       self.Option1.click()
-      
-    self.timer = current
+      self.timer = current
     
 
   def CancelFeed(self):
