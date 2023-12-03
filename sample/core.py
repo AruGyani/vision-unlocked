@@ -36,14 +36,12 @@ while True:
     detected_eyes = eye_cascade.detectMultiScale(gray, 1.1, 4)
     eyes = get_eyes(detected_eyes, frame.shape)
 
-    print(eyes)
-
     for (ex, ey, ew, eh) in eyes:
         eye_roi = gray[ey:ey + eh, ex:ex + ew]
         pupil_center, pupil_radius = detect_pupil(eye_roi)
 
         if pupil_center and pupil_radius:
-            cv2.circle(frame, (ex + pupil_center[0], ey + pupil_center[1]), pupil_radius, (255, 0, 0), 2)
+            cv2.circle(frame, (ex + pupil_center[0], ey + pupil_center[1]), pupil_radius, (255, 0, 0), 1)
             gaze_detector(frame, (ex, ey), pupil_center, (ew, eh))
 
 
