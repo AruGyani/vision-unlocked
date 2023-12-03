@@ -19,6 +19,8 @@ class MainWindow(QWidget):
   def __init__(self):
     super(MainWindow, self).__init__()
 
+    self.timer = time.time()
+
     self.layout = QVBoxLayout()
 
     self.Option1 = QPushButton('Hello')
@@ -48,7 +50,13 @@ class MainWindow(QWidget):
     self.FeedLabel.setPixmap(QPixmap.fromImage(Image))
 
   def BlinkDetectedSlot(self):
-    self.Option1.click()
+    current = time.time()
+    
+    if current - self.timer >= 2:
+      self.Option1.click()
+      
+    self.timer = current
+    
 
   def CancelFeed(self):
     self.Worker1.stop()
