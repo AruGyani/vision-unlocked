@@ -4,3 +4,4 @@ numpy
 imutils
 scipy
 pyside6
+gtts
