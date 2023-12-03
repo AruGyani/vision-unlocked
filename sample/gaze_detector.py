@@ -73,12 +73,40 @@ def detect_pupil1(eye_roi):
             return (int(x), int(y)), int(radius)
     return None, None
 
+
 def gaze_detector(frame, eye_position, pupil_center, eye_size):
+    # Define the center of the eye region
+    eye_center = (eye_position[0] + eye_size[0] // 2, eye_position[1] + eye_size[1] // 2)
+
+    # Calculate global coordinates of the pupil
+    pupil_global = (eye_position[0] + pupil_center[0], eye_position[1] + pupil_center[1])
+
+    # Define thresholds for detecting center gaze
+    center_threshold_x = eye_size[0] // 4  # Adjust this threshold as needed
+    center_threshold_y = eye_size[1] // 4  # Adjust this threshold as needed
+
+    # Check if the pupil is in the center, upper, or lower half of the eye
+    if (pupil_global[0] > eye_center[0] - center_threshold_x and
+        pupil_global[0] < eye_center[0] + center_threshold_x and
+        pupil_global[1] > eye_center[1] - center_threshold_y and
+        pupil_global[1] < eye_center[1] + center_threshold_y):
+        gaze_direction = "Center"
+    elif pupil_global[1] < eye_center[1]:
+        gaze_direction = "Up"
+    else:
+        gaze_direction = "Down"
+
+    # Draw the direction on the frame
+    cv2.putText(frame, gaze_direction, (eye_position[0], eye_position[1] - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    return gaze_direction
+
+def gaze_detector1(frame, eye_position, pupil_center, eye_size):
     # Check if the pupil is in the upper or lower half of the eye
     eye_center_y = eye_position[1] + eye_size[1] // 2
     pupil_global_y = eye_position[1] + pupil_center[1]
 
-    if pupil_global_y < eye_center_y:
+    if (pupil_global_y - 5) < eye_center_y:
         gaze_direction = "Up"
     else:
         gaze_direction = "Down"

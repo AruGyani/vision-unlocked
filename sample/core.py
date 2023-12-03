@@ -12,11 +12,11 @@ print("[STATUS] Loading face detector...")
 detector = dlib.get_frontal_face_detector()
 
 print('[STATUS] Starting camera...')
-vs = VideoStream(src=0).start()
+vs = VideoStream(src=1).start()
 
 prev = counter = total = 0
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
-
+eye_dir_arr = []
 while True:
   frame = vs.read()
   frame = imutils.resize(frame, width=400)
@@ -42,7 +42,7 @@ while True:
 
         if pupil_center and pupil_radius:
             cv2.circle(frame, (ex + pupil_center[0], ey + pupil_center[1]), pupil_radius, (255, 0, 0), 1)
-            gaze_detector(frame, (ex, ey), pupil_center, (ew, eh))
+            eye_dir_arr.append(gaze_detector(frame, (ex, ey), pupil_center, (ew, eh)))
 
 
     for (x, y) in leftEye:
