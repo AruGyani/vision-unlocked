@@ -36,6 +36,8 @@ while True:
     detected_eyes = eye_cascade.detectMultiScale(gray, 1.1, 4)
     eyes = get_eyes(detected_eyes, frame.shape)
 
+    print(eyes)
+
     for (ex, ey, ew, eh) in eyes:
         eye_roi = gray[ey:ey + eh, ex:ex + ew]
         pupil_center, pupil_radius = detect_pupil(eye_roi)
@@ -46,10 +48,10 @@ while True:
 
 
     for (x, y) in leftEye:
-      cv2.circle(frame, (x, y), 1, (255, 0, 0, -1))
+      cv2.circle(frame, (x, y), 1, (0, 0, 255, -1))
 
     for (x, y) in rightEye:
-      cv2.circle(frame, (x, y), 1, (255, 0, 0, -1))
+      cv2.circle(frame, (x, y), 1, (0, 0, 255, -1))
 
     cv2.putText(frame, "Blinks: {}".format(total), (10, 30),
                 cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
