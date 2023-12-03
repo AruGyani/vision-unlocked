@@ -35,6 +35,7 @@ class MainWindow(QWidget):
     self.Worker1 = Worker1()
     self.Worker1.start()
     self.Worker1.ImageUpdate.connect(self.ImageUpdateSlot)
+    self.Worker1.BlinkDetected.connect(self.BlinkDetectedSlot)
     
     self.setLayout(self.layout)
 
@@ -46,11 +47,15 @@ class MainWindow(QWidget):
   def ImageUpdateSlot(self, Image):
     self.FeedLabel.setPixmap(QPixmap.fromImage(Image))
 
+  def BlinkDetectedSlot(self):
+    self.Option1.click()
+
   def CancelFeed(self):
     self.Worker1.stop()
 
 class Worker1(QThread):
   ImageUpdate = Signal(QImage)
+  BlinkDetected = Signal()
   
   detector = dlib.get_frontal_face_detector()
   prev = counter = total = 0
@@ -75,6 +80,12 @@ class Worker1(QThread):
             counter=self.counter, 
             total=self.total, 
           )
+
+          if self.prev < self.total:
+            self.BlinkDetected.emit()
+
+          self.prev = self.total
+
           detected_eyes = self.eye_cascade.detectMultiScale(gray, 1.1, 4)
           eyes = get_eyes(detected_eyes, frame.shape)
 
