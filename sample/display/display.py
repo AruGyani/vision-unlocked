@@ -38,7 +38,7 @@ if __name__ == "__main__":
   w.show()
   w.resize(800, 600)
 
-  with open("style.qss", "r") as f:
+  with open("sample/display/style.qss", "r") as f:
     _style = f.read()
     app.setStyleSheet(_style)
 

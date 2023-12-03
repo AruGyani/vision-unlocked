@@ -12,7 +12,7 @@ print("[STATUS] Loading face detector...")
 detector = dlib.get_frontal_face_detector()
 
 print('[STATUS] Starting camera...')
-vs = VideoStream(src=1).start()
+vs = VideoStream(src=0).start()
 
 prev = counter = total = 0
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
