@@ -1,4 +1,4 @@
-# CV Project
+# Vision UnLocked
 
 # Download
 
@@ -45,6 +45,11 @@ Check if you're virtual environment is working by running `pip list`. There shou
 
 1. `pip`
 2. `setuptools`
+
+## OS Specific
+In `display.py` on line 49, please update the command to run the text-to-speech file to one that works with your respective operating system.
+- MacOS: `afplay`
+- Windows: `start`
 
 ## Installation
 

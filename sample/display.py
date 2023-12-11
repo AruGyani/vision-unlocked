@@ -41,6 +41,8 @@ class MainWindow(QWidget):
     
     self.setLayout(self.layout)
 
+  # Text to Speech Interaction
+  # ("afplay" is a MacOS-specific command. Please switch this to the command appropriate for your operating system)
   def greetings(self, string):
     speech = gTTS(text=string, lang='en', slow=False)
     speech.save(f"sample/display/{string.lower()}.mp3")
@@ -54,8 +56,7 @@ class MainWindow(QWidget):
     
     if current - self.timer >= 2:
       self.Option1.click()
-      
-    self.timer = current
+      self.timer = current
     
 
   def CancelFeed(self):
