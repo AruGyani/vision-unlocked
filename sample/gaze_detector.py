@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-
+# This method isolates the eyes
 def get_eyes(eyes, frame_shape):
     if len(eyes) > 2:
         eyes = sorted(eyes, key=lambda e: e[2] * e[3], reverse=True)  # Sort by size
@@ -44,7 +44,7 @@ def detect_pupil(eye_roi):
         if perimeter == 0:
             continue
         circularity = 4 * np.pi * (area / (perimeter * perimeter))
-        if area > 5 and circularity > 0.3:  # Adjust these parameters as needed
+        if area > 5 and circularity > 0.3:
             if len(contour) >= 5:  # Required for ellipse fitting
                 ellipse = cv2.fitEllipse(contour)
                 (x, y), (MA, ma), angle = ellipse
@@ -100,18 +100,5 @@ def gaze_detector(frame, eye_position, pupil_center, eye_size):
     cv2.putText(frame, gaze_direction, (eye_position[0], eye_position[1] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
     return gaze_direction
-
-def gaze_detector1(frame, eye_position, pupil_center, eye_size):
-    # Check if the pupil is in the upper or lower half of the eye
-    eye_center_y = eye_position[1] + eye_size[1] // 2
-    pupil_global_y = eye_position[1] + pupil_center[1]
-
-    if (pupil_global_y - 5) < eye_center_y:
-        gaze_direction = "Up"
-    else:
-        gaze_direction = "Down"
-
-    # Draw the direction on the frame
-    cv2.putText(frame, gaze_direction, (eye_position[0], eye_position[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
     
