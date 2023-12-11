@@ -71,7 +71,7 @@ class Worker1(QThread):
 
   def run(self):
     self.ThreadActive = True
-    Capture = VideoStream(src=0).start()
+    Capture = VideoStream(src=1).start()
 
     while self.ThreadActive:
       frame = Capture.read()
